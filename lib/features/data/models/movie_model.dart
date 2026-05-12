@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:movie_clean_architecture/features/domain/entities/movie.dart';
 
 class MovieModel extends Movie {
@@ -42,25 +44,35 @@ class MovieModel extends Movie {
   }
 
   factory MovieModel.fromMap(Map<String, dynamic> map) {
-    return MovieModel(
-      adult: map['adult'] as bool,
-      backdropPath: map['backdropPath'] as String,
-      id: map['id'] as int,
-      name: map['name'] as String,
-      originalName: map['originalName'] as String,
-      overview: map['overview'] as String,
-      posterPath: map['posterPath'] as String,
-      mediaType: map['mediaType'] as String,
-      originalLanguage: map['originalLanguage'] as String,
-      genreIds: List<int>.from((map['genreIds'] as List<int>)),
-      popularity: map['popularity'] as double,
-      firstAirDate: DateTime.fromMillisecondsSinceEpoch(
-        map['firstAirDate'] as int,
-      ),
-      softcore: map['softcore'] as bool,
-      voteAverage: map['voteAverage'] as double,
-      voteCount: map['voteCount'] as int,
-      originCountry: List<String>.from((map['originCountry'] as List<String>)),
-    );
+    try {
+      final dateString = map['release_date'] ?? map['first_air_date'] ?? '';
+
+      return MovieModel(
+        adult: map['adult'] as bool? ?? false,
+        backdropPath: (map['backdrop_path'] ?? '').toString(),
+        id: map['id']?.toInt() ?? 0,
+        name: (map['title'] ?? map['name'] ?? '').toString(),
+        originalName: (map['original_title'] ?? map['original_name'] ?? '')
+            .toString(),
+        overview: (map['overview'] ?? '').toString(),
+        posterPath: (map['poster_path'] ?? '').toString(),
+        mediaType: (map['media_type'] ?? '').toString(),
+        originalLanguage: (map['original_language'] ?? '').toString(),
+        genreIds: map['genre_ids'] != null
+            ? List<int>.from(map['genre_ids'])
+            : [],
+        popularity: map['popularity']?.toDouble() ?? 0.0,
+        firstAirDate: DateTime.tryParse(dateString) ?? DateTime.now(),
+        softcore: map['softcore'] as bool? ?? false,
+        voteAverage: map['vote_average']?.toDouble() ?? 0.0,
+        voteCount: map['vote_count']?.toInt() ?? 0,
+        originCountry: map['origin_country'] != null
+            ? List<String>.from(map['origin_country'])
+            : [],
+      );
+    } catch (e) {
+      log("Gagal mapping data: $map");
+      rethrow;
+    }
   }
 }
