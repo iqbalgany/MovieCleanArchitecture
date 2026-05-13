@@ -26,4 +26,8 @@ class SearchMoviesCubit extends Cubit<SearchMoviesState> {
       (r) => emit(SearchMoviesSuccess(movies: r)),
     );
   }
+
+  void clearSearch() {
+    emit(SearchMoviesInitial());
+  }
 }
